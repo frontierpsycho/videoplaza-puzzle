@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class CampaignMixer {
 	public static void main(String[] args) {
-		if (args.length != 1) {
+		if (args.length < 1) {
 			System.err.println("ERROR: Path to input file not provided");
 			System.exit(1);
 		}
@@ -46,7 +46,8 @@ public class CampaignMixer {
 		System.out.println("Montly total impressions: "+monthlyTotal);
 		System.out.println("Customer campaigns:\n"+customers);
 
-		
+		PuzzleSolver solver = new BruteForcePuzzleSolver(monthlyTotal, customers);
+		solver.solve();
 
 	}	
 }
