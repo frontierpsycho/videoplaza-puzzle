@@ -12,19 +12,19 @@ import java.util.Map.Entry;
 
 public class BruteForcePuzzleSolver extends PuzzleSolver {
 	private List<String> currentCombination;
-	private int currentIndex;
-	private int totalSum;
+	private int currentIndex, bestSum, maxTimes;
 	private List<String> customerNameList;
+	private List<String> bestCombination;
 
 	public BruteForcePuzzleSolver(int monthlyTotal, Map<String,Tuple<Integer,Integer>> customers) {
 		super(monthlyTotal, customers);
 		this.currentIndex = 0;
-		this.totalSum = 0;
+		this.bestSum = 0;
 
 		// determine the maximum amount of times any campaign fits into the monthly quota
-		int maxTimes = 0;
+		this.maxTimes = 0;
 		for(Map.Entry<String,Tuple<Integer,Integer>> customer : customers.entrySet()) {
-			maxTimes = Math.max(maxTimes, monthlyTotal / customer.getValue().first);
+			this.maxTimes = Math.max(this.maxTimes, monthlyTotal / customer.getValue().first);
 		}
 
 		this.currentCombination = new ArrayList<String>(maxTimes);
@@ -41,8 +41,10 @@ public class BruteForcePuzzleSolver extends PuzzleSolver {
 			}
 		});
 
-		for(int i = currentCombination.size(); i > 0; i--)
+nextCombination:
+		for(int i = maxTimes; i > 0; i--)
 		{
+			System.out.println("Trying combinations of "+i);
 			// init
 			int sum = 0;
 			currentCombination.clear();
@@ -55,21 +57,18 @@ public class BruteForcePuzzleSolver extends PuzzleSolver {
 
 			while(nextCombination(currentCombination))
 			{
-				System.out.println(currentCombination);
+				sum = examineCombination(currentCombination);
+				if(sum == -1)
+				{
+					continue nextCombination;
+				} else if (sum >= bestSum) {
+					bestSum = sum;
+					bestCombination = new ArrayList<String>(currentCombination);
+				}
 			}
 		}
+		System.out.println(bestCombination);
 		return null;
-	}
-
-	private int combinationSum(List<String> comb)
-	{
-		int sum = 0;
-		for(String campaign : comb)
-		{
-			sum += customers.get(campaign).second;
-		}
-
-		return sum;
 	}
 
 	private boolean nextCombination(List<String> combination)
@@ -102,5 +101,23 @@ public class BruteForcePuzzleSolver extends PuzzleSolver {
 			}	
 		}
 		return true;
+	}
+
+	private int examineCombination(List<String> combination)
+	{
+		int impressionSum = 0;
+		int incomeSum = 0;
+
+		for(String campaign : combination)
+		{
+			impressionSum += customers.get(campaign).first;
+			if(impressionSum > monthlyTotal)
+			{
+				// monthly total exceeded, invalid combination
+				return -1;
+			}
+			incomeSum += customers.get(campaign).second;
+		}
+		return incomeSum;
 	}
 }
