@@ -28,6 +28,7 @@ public class BruteForcePuzzleSolver extends PuzzleSolver {
 		}
 
 		this.currentCombination = new ArrayList<String>(maxTimes);
+		this.bestCombination = new ArrayList<String>(maxTimes);
 		this.customerNameList = new ArrayList<String>(customers.keySet());
 	}
 
@@ -41,10 +42,10 @@ public class BruteForcePuzzleSolver extends PuzzleSolver {
 			}
 		});
 
-nextCombination:
 		for(int i = maxTimes; i > 0; i--)
 		{
 			System.out.println("Trying combinations of "+i);
+
 			// init
 			int sum = 0;
 			currentCombination.clear();
@@ -53,21 +54,23 @@ nextCombination:
 			for(int currentIndex = 0; currentIndex < i; currentIndex++)
 			{
 				currentCombination.add(customerNameList.get(0));
+				// FIXME check the first one as well!
 			}
 
 			while(nextCombination(currentCombination))
 			{
 				sum = examineCombination(currentCombination);
-				if(sum == -1)
-				{
-					continue nextCombination;
-				} else if (sum >= bestSum) {
-					bestSum = sum;
-					bestCombination = new ArrayList<String>(currentCombination);
-				}
+				/*if(sum == -1)
+				  {
+				  continue nextCombination;
+				  } else */if (sum >= bestSum) {
+					  bestSum = sum;
+					  bestCombination = new ArrayList<String>(currentCombination);
+				  }
 			}
 		}
 		System.out.println(bestCombination);
+		System.out.println(examineCombination(bestCombination));
 		return null;
 	}
 
@@ -75,7 +78,6 @@ nextCombination:
 	{
 		ListIterator<String> iter = combination.listIterator();
 
-		int customersSize = customerNameList.size();
 		boolean flipped = true;
 
 		while(flipped)
@@ -87,7 +89,7 @@ nextCombination:
 				int index = customerNameList.indexOf(campaign);
 
 				// if this was the last campaign, re-init and cause the next one to be incremented
-				if(index + 1 == customersSize)
+				if(index + 1 == customerNameList.size())
 				{
 					iter.set(customerNameList.get(0));
 					flipped = true;
