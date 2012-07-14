@@ -46,7 +46,7 @@ public class CampaignMixer {
 		System.out.println("Montly total impressions: "+monthlyTotal);
 		System.out.println("Customer campaigns:\n"+customers);
 
-		PuzzleSolver solver = new BruteForcePuzzleSolver(monthlyTotal, customers);
+		PuzzleSolver solver = new DynamicProgrammingPuzzleSolver(monthlyTotal, customers);
 		solver.solve();
 
 	}	
