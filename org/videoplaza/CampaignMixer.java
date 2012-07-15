@@ -47,7 +47,19 @@ public class CampaignMixer {
 		System.out.println("Customer campaigns:\n"+customers);
 
 		PuzzleSolver solver = new DynamicProgrammingPuzzleSolver(monthlyTotal, customers);
-		solver.solve();
+		Map<String,Integer> solution = solver.solve();
+
+		System.out.println(solution);
+
+		int value = 0;
+		int impressions = 0;
+		for(Map.Entry<String,Integer> entry : solution.entrySet())
+		{
+			int number = entry.getValue();
+			value += number * customers.get(entry.getKey()).second;
+			impressions += number * customers.get(entry.getKey()).first;
+		}
+		System.out.println("Total value: "+value+", total impressions: "+impressions);
 
 	}	
 }

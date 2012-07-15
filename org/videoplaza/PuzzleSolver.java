@@ -12,5 +12,5 @@ public abstract class PuzzleSolver {
 		this.customers = customers;
 	}
 
-	public abstract List<Tuple<String,Integer>> solve();
+	public abstract Map<String,Integer> solve();
 }

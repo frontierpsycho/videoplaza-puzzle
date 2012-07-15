@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 public class DynamicProgrammingPuzzleSolver extends PuzzleSolver {
 	// this will hold the best sums and combinations for each max value
-	private Map<Integer,Integer> table;
+	private Map<Integer,Tuple<Integer, Map<String,Integer>>> table;
 	private List<String> customerNameList;
 	private int GCD;
 
@@ -29,17 +29,16 @@ public class DynamicProgrammingPuzzleSolver extends PuzzleSolver {
 		}
 		this.GCD = GCD.intValue();
 		
-		for(Tuple<Integer,Integer> customer : customers.values())
-		{
-			customer.first = customer.first/this.GCD;
-		}
-		this.monthlyTotal = this.monthlyTotal/this.GCD;
+		divideByGCD();
 
-		this.table = new HashMap<Integer,Integer>();
-		this.table.put(0, 0);
+		this.table = new HashMap<Integer,Tuple<Integer, Map<String,Integer>>>();
+		for(int i = 0; i < this.monthlyTotal; i++)
+		{
+			initTableRow(i);
+		}
 	}	
 
-	public List<Tuple<String,Integer>> solve() {
+	public Map<String,Integer> solve() {
 		Collections.sort(customerNameList, new Comparator<String>() {
 			public int compare(String a, String b) {
 				Tuple<Integer,Integer> customerA = customers.get(a);
@@ -57,15 +56,25 @@ public class DynamicProgrammingPuzzleSolver extends PuzzleSolver {
 				int campaignSize = customers.get(customerName).first;
 				int campaignValue = customers.get(customerName).second;
 
-				// find the best sum of values with a sum of impressions less than tempMax
-				// use previous best sums
-				if(i <= campaignSize)
+				if(i >= campaignSize)
 				{
-					table.put(i, 0);
-				} else {
-					int newSum = table.get(i - campaignSize) + campaignValue;
-					if(table.get(i) == null || newSum > table.get(i)) {
-						table.put(i, newSum);
+					int newSum = table.get(i - campaignSize).first + campaignValue;
+					Tuple<Integer,Map<String,Integer>> existingRow = table.get(i);
+
+					// if new sum is better than the one achieved so far
+					// keep it and replace combination
+					if(newSum > existingRow.first) {
+						existingRow.first = newSum;
+
+						// fetch table from i - campaignSize and add new element
+						Map<String,Integer> combinationWithout = table.get(i - campaignSize).second;
+
+						int newCount = combinationWithout.containsKey(customerName) ? combinationWithout.get(customerName) + 1 : 1;
+
+						// replace combination with updated one to match the new sum
+						existingRow.second.clear();
+						existingRow.second.putAll(combinationWithout);
+						existingRow.second.put(customerName, newCount);
 					}
 				}
 			}
@@ -75,7 +84,35 @@ public class DynamicProgrammingPuzzleSolver extends PuzzleSolver {
 		{
 			temp--;
 		}
-		System.out.println(table.get(temp));
-		return null;
+
+		restoreByGCD();
+		
+		Map<String,Integer> result = table.get(temp).second;
+
+		return result;
+	}
+
+	private void initTableRow(int i)
+	{
+		Map<String,Integer> bestComb = new HashMap<String,Integer>(customers.size());
+		this.table.put(i, new Tuple<Integer,Map<String,Integer>>(0, bestComb));
+	}
+
+	private void divideByGCD()
+	{
+		for(Tuple<Integer,Integer> customer : this.customers.values())
+		{
+			customer.first = customer.first/this.GCD;
+		}
+		this.monthlyTotal = this.monthlyTotal/this.GCD;
+	}
+
+	private void restoreByGCD()
+	{
+		for(Tuple<Integer,Integer> customer : this.customers.values())
+		{
+			customer.first = customer.first*this.GCD;
+		}
+		this.monthlyTotal = this.monthlyTotal*this.GCD;
 	}
 }
