@@ -42,24 +42,23 @@ public class CampaignMixer {
 			System.exit(1);
 		}
 
-		System.out.println("Input read.");
-		System.out.println("Montly total impressions: "+monthlyTotal);
-		System.out.println("Customer campaigns:\n"+customers);
-
 		PuzzleSolver solver = new DynamicProgrammingPuzzleSolver(monthlyTotal, customers);
 		Map<String,Integer> solution = solver.solve();
-
-		System.out.println(solution);
 
 		int value = 0;
 		int impressions = 0;
 		for(Map.Entry<String,Integer> entry : solution.entrySet())
 		{
 			int number = entry.getValue();
-			value += number * customers.get(entry.getKey()).second;
-			impressions += number * customers.get(entry.getKey()).first;
+			int customerImpressions = number * customers.get(entry.getKey()).first;
+			int customerValue = number * customers.get(entry.getKey()).second;
+
+			System.out.println(entry.getKey()+","+entry.getValue()+","+customerImpressions+","+customerValue);
+
+			impressions += customerImpressions;
+			value += customerValue;
 		}
-		System.out.println("Total value: "+value+", total impressions: "+impressions);
+		System.out.println(impressions+","+value);
 
 	}	
 }
