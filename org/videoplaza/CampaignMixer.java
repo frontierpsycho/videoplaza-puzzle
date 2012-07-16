@@ -8,6 +8,23 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * CampaignMixer finds the best combination of campaigns to be 
+ * sold to clients of our Imaginary Ad Company (R), depending
+ * on a monthly total number of impressions available, and a
+ * set of ad campaigns.
+ *
+ * The implementation is decoupled from the algorith actually used 
+ * to calculate the best combination. An interface, PuzzleSolver,
+ * is used to solve the problem. 
+ *
+ * This class has a main function that reads the input of the problem,
+ * handles errors, collects the output and returns it in the specified
+ * form.
+ *
+ * @author Alexander Altanis
+ * @version 1.0
+ */
 public class CampaignMixer {
 	public static void main(String[] args) {
 		if (args.length < 1) {
@@ -63,6 +80,9 @@ public class CampaignMixer {
 	}	
 }
 
+/**
+ * A generic Tuple implementation for use with the CampaignMixer.
+ */
 class Tuple<A,B> {
 	// public because there is no need in this class for
 	// austere access restrictions

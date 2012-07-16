@@ -9,12 +9,42 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * A solver for the campaign mixer problem, using dynamic programming.
+ *
+ * This is actually the knapsack problem.
+ *
+ * The main idea behind this standard solution is that to calculate
+ * the optimal combination of campaigns to filla given monthly quota of
+ * capacity w, we can use the optimal combinations of smaller 
+ * capacities. By adding each available campaign to a suitable smaller
+ * optimal combination, and choosing the best among them, we obtain 
+ * the optimal combination for w. 
+ *
+ * We can use this by iterating over capacities from 0 to our given 
+ * quota, and by calculating the optimal so far for each one. This
+ * will provide all the necessary smaller optimal combinations for 
+ * us to calculate the optimal combination for w.
+ *
+ * We divide by the GCD of the weights of the campaigns to reduce the size 
+ * of the problem. 
+ */
 public class DynamicProgrammingPuzzleSolver extends PuzzleSolver {
-	// this will hold the best sums and combinations for each max value
+	// this will hold the best sums and combinations for each max capacity
 	private Map<Integer,Tuple<Integer, Map<String,Integer>>> table;
 	private List<String> customerNameList;
 	private int GCD;
 
+	/**
+	 * Standard constructor, initializes capacity (w), and campaigns.
+	 *
+	 * Also divides by GCD, which it stores to restore the campaigns later, 
+	 * and initializes the table which will hold the optimal combinations
+	 * for each value of maximum capacity. 
+	 *
+	 * @param monthlyTotal The monthly total of impressions for this month.
+	 * @param customers The number of impressions and price per client. 
+	 */
 	public DynamicProgrammingPuzzleSolver(int monthlyTotal, Map<String,Tuple<Integer,Integer>> customers) {
 		super(monthlyTotal, customers);
 
@@ -92,12 +122,18 @@ public class DynamicProgrammingPuzzleSolver extends PuzzleSolver {
 		return result;
 	}
 
+	/**
+	 * Initializes a row of the best combinations table with a zero sum and an empty combination.
+	 */
 	private void initTableRow(int i)
 	{
 		Map<String,Integer> bestComb = new HashMap<String,Integer>(customers.size());
 		this.table.put(i, new Tuple<Integer,Map<String,Integer>>(0, bestComb));
 	}
 
+	/**
+	 * Divides the campaign sizes by their GCD in order to reduce the size of the problem.
+	 */
 	private void divideByGCD()
 	{
 		for(Tuple<Integer,Integer> customer : this.customers.values())
@@ -107,6 +143,9 @@ public class DynamicProgrammingPuzzleSolver extends PuzzleSolver {
 		this.monthlyTotal = this.monthlyTotal/this.GCD;
 	}
 
+	/**
+	 * Restores the campaign sizes to their previous values.
+	 */
 	private void restoreByGCD()
 	{
 		for(Tuple<Integer,Integer> customer : this.customers.values())
